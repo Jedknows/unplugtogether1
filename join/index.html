@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Unplug Together — Join Your Partner</title>
+  <!-- Smart App Banner: shows native iOS banner to open/install the app -->
+  <meta name="apple-itunes-app" content="app-id=6760623557, app-argument=join">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -68,6 +70,29 @@
       margin-top: 12px;
     }
     .fallback a { color: #8B7AC7; }
+    .copy-hint {
+      font-size: 11px;
+      color: #8B6F5A;
+      opacity: 0.4;
+      margin-top: 4px;
+    }
+    .copied-toast {
+      display: none;
+      font-size: 12px;
+      color: #8B7AC7;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+    .copied-toast.show {
+      display: block;
+      animation: fadeInOut 1.5s ease;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
   </style>
   <script>
     function getCode() {
@@ -82,13 +107,27 @@
 
     document.addEventListener('DOMContentLoaded', function() {
       const code = getCode();
-      if (code) {
-        document.getElementById('code-display').textContent = code;
-        const deepLink = 'unplugtogether://join?code=' + code;
-        document.getElementById('open-btn').href = deepLink;
-        // Auto-open on iOS
-        window.location.href = deepLink;
-      }
+      if (!code) return;
+
+      // Show the code on the page
+      document.getElementById('code-display').textContent = code;
+
+      // Set the "open in app" button to use custom URL scheme
+      // (Universal links won't re-trigger from within the browser on the same domain)
+      const deepLink = 'unplugtogether://join?code=' + code;
+      document.getElementById('open-btn').href = deepLink;
+
+      // Copy code to clipboard when tapping the code box
+      const codeBox = document.getElementById('code-display');
+      codeBox.style.cursor = 'pointer';
+      codeBox.addEventListener('click', function() {
+        navigator.clipboard.writeText(code).then(function() {
+          const toast = document.getElementById('copied-toast');
+          toast.classList.remove('show');
+          void toast.offsetWidth; // force reflow
+          toast.classList.add('show');
+        }).catch(function() {});
+      });
     });
   </script>
 </head>
@@ -98,7 +137,11 @@
     <h1>unplug together</h1>
     <p class="subtitle">your partner invited you to grow a garden together</p>
     <div class="code-box" id="code-display">------</div>
-    <a class="open-btn" id="open-btn" href="#">open in app</a>
+    <p class="copy-hint">tap code to copy</p>
+    <div class="copied-toast" id="copied-toast">copied!</div>
+    <div style="margin-top: 20px;">
+      <a class="open-btn" id="open-btn" href="#">open in app</a>
+    </div>
     <p class="fallback">
       Don't have the app yet?<br>
       <a href="https://apps.apple.com/app/unplugtogether/id6760623557">Download on the App Store</a>
