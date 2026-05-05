@@ -158,6 +158,25 @@ class ScreenTimeManager: ObservableObject {
         // When usage crosses the threshold, DeviceActivityMonitor fires
         var events: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
 
+        // Find the max limit to determine how many usage checkpoints we need
+        let maxLimit = limits.map { $0.dailyLimitMinutes }.max() ?? 60
+
+        // Add usage tracking checkpoints every 5 minutes up to the max limit
+        // The DeviceActivityMonitor extension writes the reached checkpoint to shared storage
+        // so the main app can read approximate usage
+        let checkpointInterval = 5
+        for minutes in stride(from: checkpointInterval, through: maxLimit, by: checkpointInterval) {
+            let eventName = DeviceActivityEvent.Name("usage_\(minutes)")
+            let threshold = DateComponents(minute: minutes)
+            let event = DeviceActivityEvent(
+                applications: selectedApps.applicationTokens,
+                categories: selectedApps.categoryTokens,
+                webDomains: selectedApps.webDomainTokens,
+                threshold: threshold
+            )
+            events[eventName] = event
+        }
+
         for limit in limits {
             // Create an event that fires when the app hits its limit
             let eventName = DeviceActivityEvent.Name("limit_\(limit.bundleIdentifier)")
@@ -295,6 +314,14 @@ class ScreenTimeManager: ObservableObject {
     }
 
     // MARK: - Usage Reporting
+
+    /// Read the current usage minutes from shared storage (written by DeviceActivityMonitor extension)
+    /// The extension writes the highest checkpoint reached, giving us ~5-minute accuracy
+    func readCurrentUsageMinutes() -> Int {
+        guard let defaults = sharedDefaults else { return 0 }
+        let dateKey = ISO8601DateFormatter().string(from: Calendar.current.startOfDay(for: Date()))
+        return defaults.integer(forKey: "currentUsageMinutes_\(dateKey)")
+    }
 
     /// Save current usage data to shared storage (called periodically)
     func saveUsageData(appBundleId: String, minutesUsed: Int, partnerId: String) {

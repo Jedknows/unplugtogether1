@@ -73,7 +73,10 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
 
         let eventName = event.rawValue
 
-        if eventName.hasPrefix("warning_") {
+        if eventName.hasPrefix("usage_") {
+            // Usage tracking checkpoint — record approximate minutes used
+            handleUsageCheckpoint(eventName: eventName)
+        } else if eventName.hasPrefix("warning_") {
             // 80% warning — notify but don't block
             handleWarning(eventName: eventName)
         } else if eventName.hasPrefix("limit_") {
@@ -86,6 +89,24 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     override func eventWillReachThresholdWarning(_ event: DeviceActivityEvent.Name, activity: DeviceActivityName) {
         super.eventWillReachThresholdWarning(event, activity: activity)
         // Can be used for pre-warning at 5 min before limit
+    }
+
+    // MARK: - Usage Tracking Checkpoint
+
+    private func handleUsageCheckpoint(eventName: String) {
+        // Event name format: "usage_15" means 15 minutes of total usage reached
+        let minutesStr = String(eventName.dropFirst("usage_".count))
+        guard let minutes = Int(minutesStr) else { return }
+
+        let dateKey = ISO8601DateFormatter().string(from: Calendar.current.startOfDay(for: Date()))
+        let key = "currentUsageMinutes_\(dateKey)"
+
+        // Only update if this checkpoint is higher than what we've recorded
+        let current = sharedDefaults?.integer(forKey: key) ?? 0
+        if minutes > current {
+            sharedDefaults?.set(minutes, forKey: key)
+            print("[Monitor] Usage checkpoint: \(minutes) minutes")
+        }
     }
 
     // MARK: - Warning Handler (80% of limit)

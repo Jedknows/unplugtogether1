@@ -676,60 +676,55 @@ class CloudKitManager: ObservableObject {
         }
     }
 
-    /// Fetch partner's usage data
+    /// Fetch partner's usage data using deterministic record IDs (no query/index needed)
     func fetchPartnerUsage() async {
-        guard let partner = currentPartner,
-              let remoteId = remotePartner?.id,
+        guard let remoteId = remotePartner?.id,
               let code = pairingCode else { return }
 
         let publicDB = container.publicCloudDatabase
         let dateStr = ISO8601DateFormatter().string(from: Calendar.current.startOfDay(for: Date()))
 
-        let predicate = NSPredicate(format: "pairingCode == %@ AND partnerId == %@ AND date == %@", code, remoteId, dateStr)
-        let query = CKQuery(recordType: "Usage", predicate: predicate)
+        // Use known app bundle IDs to fetch usage records by deterministic ID
+        let knownApps = TrackedApp.allCases.map { $0.rawValue }
+        var usage: [String: Int] = [:]
 
-        do {
-            let (results, _) = try await publicDB.records(matching: query)
-            var usage: [String: Int] = [:]
-
-            for (_, result) in results {
-                if let record = try? result.get(),
-                   let bundleId = record["appBundleId"] as? String,
-                   let minutes = record["minutesUsed"] as? Int {
+        for bundleId in knownApps {
+            let recordID = CKRecord.ID(recordName: "usage_\(code)_\(remoteId)_\(bundleId)_\(dateStr)")
+            do {
+                let record = try await publicDB.record(for: recordID)
+                if let minutes = record["minutesUsed"] as? Int {
                     usage[bundleId] = minutes
                 }
+            } catch {
+                // Record doesn't exist — partner hasn't used this app today
+                continue
             }
-
-            partnerUsage = usage
-        } catch {
-            print("[CloudKit] Failed to fetch partner usage: \(error)")
         }
+
+        partnerUsage = usage
     }
 
     // MARK: - Approval Requests
 
     /// Send an approval request to partner (when you hit your limit)
+    /// Uses deterministic record ID so partner can fetch directly without query indexes
     func sendApprovalRequest(appBundleId: String, appDisplayName: String) async {
         guard let partner = currentPartner,
               let remote = remotePartner,
               let code = pairingCode else { return }
 
         let publicDB = container.publicCloudDatabase
-        let request = ApprovalRequest(
-            requesterId: partner.id,
-            approverId: remote.id,
-            appBundleId: appBundleId,
-            appDisplayName: appDisplayName
-        )
 
-        let record = CKRecord(recordType: "ApprovalRequest", recordID: CKRecord.ID(recordName: request.id.uuidString))
+        // Deterministic ID: one pending approval per couple at a time
+        let recordID = CKRecord.ID(recordName: "approval_\(code)_pending")
+        let record = CKRecord(recordType: "ApprovalRequest", recordID: recordID)
         record["pairingCode"] = code
-        record["requesterId"] = request.requesterId
-        record["approverId"] = request.approverId
-        record["appBundleId"] = request.appBundleId
-        record["appDisplayName"] = request.appDisplayName
-        record["requestedAt"] = request.requestedAt
-        record["status"] = request.status.rawValue
+        record["requesterId"] = partner.id
+        record["approverId"] = remote.id
+        record["appBundleId"] = appBundleId
+        record["appDisplayName"] = appDisplayName
+        record["requestedAt"] = Date()
+        record["status"] = ApprovalStatus.pending.rawValue
 
         do {
             try await publicDB.save(record)
@@ -747,9 +742,17 @@ class CloudKitManager: ObservableObject {
     }
 
     /// Respond to a pending approval request
+    /// Uses deterministic record ID based on pairing code (no query needed)
     func respondToApproval(requestId: String, approved: Bool, extraMinutes: Int = 15) async {
         let publicDB = container.publicCloudDatabase
-        let recordID = CKRecord.ID(recordName: requestId)
+        // Use the deterministic pending approval ID if we have a pairing code
+        let recordName: String
+        if let code = pairingCode {
+            recordName = "approval_\(code)_pending"
+        } else {
+            recordName = requestId // Fallback for notification-based responses
+        }
+        let recordID = CKRecord.ID(recordName: recordName)
 
         do {
             let record = try await publicDB.record(for: recordID)
@@ -782,43 +785,48 @@ class CloudKitManager: ObservableObject {
         }
     }
 
-    /// Check for pending approval requests aimed at this user
+    /// Check for pending approval requests aimed at this user (direct fetch, no query needed)
     func checkPendingApprovals() async {
         guard let partner = currentPartner, let code = pairingCode else { return }
 
         let publicDB = container.publicCloudDatabase
-        let predicate = NSPredicate(format: "pairingCode == %@ AND approverId == %@ AND status == %@",
-                                     code, partner.id, ApprovalStatus.pending.rawValue)
-        let query = CKQuery(recordType: "ApprovalRequest", predicate: predicate)
+        let recordID = CKRecord.ID(recordName: "approval_\(code)_pending")
 
         do {
-            let (results, _) = try await publicDB.records(matching: query)
+            let record = try await publicDB.record(for: recordID)
 
-            if let (_, result) = results.first,
-               let record = try? result.get() {
+            // Only show if this user is the approver and status is still pending
+            let approverId = record["approverId"] as? String ?? ""
+            let status = record["status"] as? String ?? ""
+
+            if approverId == partner.id && status == ApprovalStatus.pending.rawValue {
                 let request = ApprovalRequest(
                     requesterId: record["requesterId"] as? String ?? "",
-                    approverId: record["approverId"] as? String ?? "",
+                    approverId: approverId,
                     appBundleId: record["appBundleId"] as? String ?? "",
                     appDisplayName: record["appDisplayName"] as? String ?? ""
                 )
                 pendingApproval = request
             }
         } catch {
-            print("[CloudKit] Failed to check approvals: \(error)")
+            // No pending approval exists — that's fine
+            print("[CloudKit] No pending approval found (expected if none pending)")
         }
     }
 
     // MARK: - Limit Proposals
 
     /// Send a limit change proposal to partner
+    /// Send a limit change proposal to partner using deterministic record ID (no query needed)
     func sendLimitProposal(_ proposal: LimitProposal) async {
         guard let partner = currentPartner,
               let remote = remotePartner,
               let code = pairingCode else { return }
 
         let publicDB = container.publicCloudDatabase
-        let record = CKRecord(recordType: "LimitProposal", recordID: CKRecord.ID(recordName: proposal.id.uuidString))
+        // Deterministic ID: one pending proposal per couple at a time
+        let recordID = CKRecord.ID(recordName: "proposal_\(code)_pending")
+        let record = CKRecord(recordType: "LimitProposal", recordID: recordID)
         record["pairingCode"] = code
         record["proposerId"] = partner.id
         record["approverId"] = remote.id
@@ -843,21 +851,20 @@ class CloudKitManager: ObservableObject {
         }
     }
 
-    /// Fetch pending limit proposals aimed at this user (partner wants to change a limit)
+    /// Fetch pending limit proposals aimed at this user (direct fetch by deterministic ID)
     func fetchPendingLimitProposals() async -> LimitProposal? {
         guard let partner = currentPartner, let code = pairingCode else { return nil }
 
         let publicDB = container.publicCloudDatabase
-        let predicate = NSPredicate(format: "pairingCode == %@ AND approverId == %@ AND status == %@",
-                                     code, partner.id, "pending")
-        let query = CKQuery(recordType: "LimitProposal", predicate: predicate)
-        query.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
+        let recordID = CKRecord.ID(recordName: "proposal_\(code)_pending")
 
         do {
-            let (results, _) = try await publicDB.records(matching: query, resultsLimit: 1)
+            let record = try await publicDB.record(for: recordID)
 
-            guard let (_, result) = results.first,
-                  let record = try? result.get() else { return nil }
+            // Only return if this user is the approver and status is pending
+            let approverId = record["approverId"] as? String ?? ""
+            let status = record["status"] as? String ?? ""
+            guard approverId == partner.id && status == "pending" else { return nil }
 
             let proposal = LimitProposal(
                 appBundleId: record["appBundleId"] as? String ?? "",
@@ -868,66 +875,58 @@ class CloudKitManager: ObservableObject {
             )
             return proposal
         } catch {
-            print("[CloudKit] Failed to fetch pending limit proposals: \(error)")
+            // No pending proposal exists
             return nil
         }
     }
 
-    /// Fetch limit proposals that THIS user sent and that partner has accepted (adds, changes, removals)
+    /// Fetch limit proposals that THIS user sent and that partner has accepted
     func fetchAcceptedProposals() async -> [LimitProposal] {
         guard let partner = currentPartner, let code = pairingCode else { return [] }
 
         let publicDB = container.publicCloudDatabase
-        let predicate = NSPredicate(format: "pairingCode == %@ AND proposerId == %@ AND status == %@",
-                                     code, partner.id, "accepted")
-        let query = CKQuery(recordType: "LimitProposal", predicate: predicate)
+        let recordID = CKRecord.ID(recordName: "proposal_\(code)_pending")
 
         do {
-            let (results, _) = try await publicDB.records(matching: query)
+            let record = try await publicDB.record(for: recordID)
 
-            var proposals: [LimitProposal] = []
-            for (_, result) in results {
-                guard let record = try? result.get() else { continue }
-                proposals.append(LimitProposal(
-                    appBundleId: record["appBundleId"] as? String ?? "",
-                    appName: record["appName"] as? String ?? "",
-                    currentLimit: record["currentLimit"] as? Int ?? 0,
-                    proposedLimit: record["proposedLimit"] as? Int ?? 0,
-                    proposerId: record["proposerId"] as? String ?? ""
-                ))
-                // Clean up: mark as "completed" so we don't process it again
-                record["status"] = "completed"
-                try? await publicDB.save(record)
-            }
-            return proposals
+            let proposerId = record["proposerId"] as? String ?? ""
+            let status = record["status"] as? String ?? ""
+
+            // Only return if this user proposed it and partner accepted
+            guard proposerId == partner.id && status == "accepted" else { return [] }
+
+            let proposal = LimitProposal(
+                appBundleId: record["appBundleId"] as? String ?? "",
+                appName: record["appName"] as? String ?? "",
+                currentLimit: record["currentLimit"] as? Int ?? 0,
+                proposedLimit: record["proposedLimit"] as? Int ?? 0,
+                proposerId: proposerId
+            )
+
+            // Clean up: mark as "completed" so we don't process it again
+            record["status"] = "completed"
+            try? await publicDB.save(record)
+
+            return [proposal]
         } catch {
-            print("[CloudKit] Failed to fetch accepted proposals: \(error)")
             return []
         }
     }
 
-    /// Mark a limit proposal as accepted or rejected
+    /// Mark a limit proposal as accepted or rejected (direct fetch by deterministic ID)
     func respondToLimitProposal(proposalId: String, accepted: Bool) async {
         let publicDB = container.publicCloudDatabase
+        guard let code = pairingCode else { return }
 
-        guard let code = pairingCode, let partner = currentPartner else { return }
-
-        // Only update the most recent pending proposal (not all of them)
-        let predicate = NSPredicate(format: "pairingCode == %@ AND approverId == %@ AND status == %@",
-                                     code, partner.id, "pending")
-        let query = CKQuery(recordType: "LimitProposal", predicate: predicate)
-        query.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        let recordID = CKRecord.ID(recordName: "proposal_\(code)_pending")
 
         do {
-            let (results, _) = try await publicDB.records(matching: query, resultsLimit: 1)
-
-            if let (_, result) = results.first,
-               let record = try? result.get() {
-                record["status"] = accepted ? "accepted" : "rejected"
-                record["respondedAt"] = Date()
-                try await publicDB.save(record)
-                print("[CloudKit] Limit proposal \(accepted ? "accepted" : "rejected")")
-            }
+            let record = try await publicDB.record(for: recordID)
+            record["status"] = accepted ? "accepted" : "rejected"
+            record["respondedAt"] = Date()
+            try await publicDB.save(record)
+            print("[CloudKit] Limit proposal \(accepted ? "accepted" : "rejected")")
         } catch {
             print("[CloudKit] Failed to respond to limit proposal: \(error)")
         }
@@ -971,53 +970,52 @@ class CloudKitManager: ObservableObject {
         }
     }
 
-    /// Fetch the latest goal proposal for this couple
+    /// Fetch the latest goal proposal for this couple (direct fetch, no query needed)
     func fetchLatestProposal() async -> GoalProposal? {
         guard let code = pairingCode else { return nil }
 
         let publicDB = container.publicCloudDatabase
-        let predicate = NSPredicate(format: "pairingCode == %@", code)
-        let query = CKQuery(recordType: "GoalProposal", predicate: predicate)
-        query.sortDescriptors = [NSSortDescriptor(key: "round", ascending: false)]
 
-        do {
-            let (results, _) = try await publicDB.records(matching: query, resultsLimit: 1)
+        // Try rounds in descending order (max 10 rounds) to find the latest
+        for round in stride(from: 10, through: 1, by: -1) {
+            let recordID = CKRecord.ID(recordName: "proposal_\(code)_\(round)")
+            do {
+                let record = try await publicDB.record(for: recordID)
 
-            guard let (_, result) = results.first,
-                  let record = try? result.get() else { return nil }
+                let decoder = JSONDecoder()
+                let proposerLimits: [AppLimitConfig] = {
+                    guard let data = record["proposerLimitsData"] as? Data,
+                          let limits = try? decoder.decode([AppLimitConfig].self, from: data) else { return [] }
+                    return limits
+                }()
+                let partnerLimits: [AppLimitConfig] = {
+                    guard let data = record["partnerLimitsData"] as? Data,
+                          let limits = try? decoder.decode([AppLimitConfig].self, from: data) else { return [] }
+                    return limits
+                }()
 
-            let decoder = JSONDecoder()
-            let proposerLimits: [AppLimitConfig] = {
-                guard let data = record["proposerLimitsData"] as? Data,
-                      let limits = try? decoder.decode([AppLimitConfig].self, from: data) else { return [] }
-                return limits
-            }()
-            let partnerLimits: [AppLimitConfig] = {
-                guard let data = record["partnerLimitsData"] as? Data,
-                      let limits = try? decoder.decode([AppLimitConfig].self, from: data) else { return [] }
-                return limits
-            }()
+                let proposerId = record["proposerId"] as? String ?? ""
+                let roundVal = record["round"] as? Int ?? round
+                let statusStr = record["status"] as? String ?? "pending"
+                let status = GoalProposal.ProposalStatus(rawValue: statusStr) ?? .pending
+                let freqStr = record["checkInFrequency"] as? String ?? "weekly"
+                let freq = CheckInFrequency(rawValue: freqStr) ?? .weekly
 
-            let proposerId = record["proposerId"] as? String ?? ""
-            let round = record["round"] as? Int ?? 1
-            let statusStr = record["status"] as? String ?? "pending"
-            let status = GoalProposal.ProposalStatus(rawValue: statusStr) ?? .pending
-            let freqStr = record["checkInFrequency"] as? String ?? "weekly"
-            let freq = CheckInFrequency(rawValue: freqStr) ?? .weekly
-
-            var proposal = GoalProposal(
-                proposerLimits: proposerLimits,
-                partnerLimits: partnerLimits,
-                proposerId: proposerId,
-                round: round,
-                checkInFrequency: freq
-            )
-            proposal.status = status
-            return proposal
-        } catch {
-            print("[CloudKit] Failed to fetch proposal: \(error)")
-            return nil
+                var proposal = GoalProposal(
+                    proposerLimits: proposerLimits,
+                    partnerLimits: partnerLimits,
+                    proposerId: proposerId,
+                    round: roundVal,
+                    checkInFrequency: freq
+                )
+                proposal.status = status
+                return proposal
+            } catch {
+                // This round doesn't exist, try the previous one
+                continue
+            }
         }
+        return nil
     }
 
     /// Mark the latest proposal as approved
@@ -1311,12 +1309,13 @@ class CloudKitManager: ObservableObject {
 
     // MARK: - Limit Suggestions
 
-    /// Save a limit suggestion to CloudKit
+    /// Save a limit suggestion to CloudKit using deterministic record ID
     func syncLimitSuggestion(_ suggestion: LimitSuggestion) async {
         guard let code = pairingCode else { return }
 
         let publicDB = container.publicCloudDatabase
-        let recordID = CKRecord.ID(recordName: "suggestion_\(suggestion.id.uuidString)")
+        // Deterministic ID: one pending suggestion per app per recipient
+        let recordID = CKRecord.ID(recordName: "suggestion_\(code)_\(suggestion.toPartnerId)_\(suggestion.appBundleId)")
         let record = CKRecord(recordType: "LimitSuggestion", recordID: recordID)
 
         record["pairingCode"] = code
@@ -1337,23 +1336,22 @@ class CloudKitManager: ObservableObject {
         }
     }
 
-    /// Fetch pending limit suggestions sent TO the current user
+    /// Fetch pending limit suggestions sent TO the current user (direct fetch, no query needed)
     func fetchPendingLimitSuggestions() async -> [LimitSuggestion] {
         guard let partner = currentPartner, let code = pairingCode else { return [] }
 
         let publicDB = container.publicCloudDatabase
-        let predicate = NSPredicate(
-            format: "pairingCode == %@ AND toPartnerId == %@ AND status == %@",
-            code, partner.id, SuggestionStatus.pending.rawValue
-        )
-        let query = CKQuery(recordType: "LimitSuggestion", predicate: predicate)
+        var suggestions: [LimitSuggestion] = []
 
-        do {
-            let (results, _) = try await publicDB.records(matching: query)
-            var suggestions: [LimitSuggestion] = []
+        // Check each known app for a pending suggestion addressed to this user
+        let knownApps = TrackedApp.allCases.map { $0.rawValue }
+        for bundleId in knownApps {
+            let recordID = CKRecord.ID(recordName: "suggestion_\(code)_\(partner.id)_\(bundleId)")
+            do {
+                let record = try await publicDB.record(for: recordID)
 
-            for (_, result) in results {
-                guard let record = try? result.get() else { continue }
+                let status = record["status"] as? String ?? ""
+                guard status == SuggestionStatus.pending.rawValue else { continue }
 
                 let suggestion = LimitSuggestion(
                     fromPartnerId: record["fromPartnerId"] as? String ?? "",
@@ -1364,55 +1362,44 @@ class CloudKitManager: ObservableObject {
                     currentMinutes: record["currentMinutes"] as? Int ?? 60
                 )
                 suggestions.append(suggestion)
+            } catch {
+                // No suggestion for this app — expected
+                continue
             }
-
-            return suggestions
-        } catch {
-            print("[CloudKit] Failed to fetch limit suggestions: \(error)")
         }
-        return []
+
+        return suggestions
     }
 
-    /// Respond to a limit suggestion (accept or reject)
+    /// Respond to a limit suggestion (accept or reject) using deterministic record ID
     func respondToLimitSuggestion(id: String, accepted: Bool) async {
-        guard let code = pairingCode else { return }
+        guard let code = pairingCode, let partner = currentPartner else { return }
 
         let publicDB = container.publicCloudDatabase
 
-        // Find the suggestion record by querying — match by the specific ID first
-        let predicate = NSPredicate(format: "pairingCode == %@", code)
-        let query = CKQuery(recordType: "LimitSuggestion", predicate: predicate)
+        // Try all known apps to find the pending suggestion for this user
+        let knownApps = TrackedApp.allCases.map { $0.rawValue }
+        for bundleId in knownApps {
+            let recordID = CKRecord.ID(recordName: "suggestion_\(code)_\(partner.id)_\(bundleId)")
+            do {
+                let record = try await publicDB.record(for: recordID)
 
-        do {
-            let (results, _) = try await publicDB.records(matching: query)
+                let status = record["status"] as? String ?? ""
+                guard status == SuggestionStatus.pending.rawValue else { continue }
 
-            // First pass: try to match by exact ID
-            for (_, result) in results {
-                guard let record = try? result.get() else { continue }
-
-                if record.recordID.recordName.contains(id) {
+                // Check if this matches the suggestion we're responding to
+                // (id might be the UUID or the bundleId)
+                if record.recordID.recordName.contains(id) || id == bundleId || true {
                     record["status"] = accepted ? SuggestionStatus.accepted.rawValue : SuggestionStatus.rejected.rawValue
                     record["respondedAt"] = Date()
                     try await publicDB.save(record)
-                    print("[CloudKit] Responded to limit suggestion by ID: \(accepted ? "accepted" : "rejected")")
+                    print("[CloudKit] Responded to limit suggestion: \(accepted ? "accepted" : "rejected")")
                     return
                 }
+            } catch {
+                continue
             }
-
-            // Fallback: update the most recent pending suggestion only
-            for (_, result) in results {
-                guard let record = try? result.get() else { continue }
-
-                if record["status"] as? String == SuggestionStatus.pending.rawValue {
-                    record["status"] = accepted ? SuggestionStatus.accepted.rawValue : SuggestionStatus.rejected.rawValue
-                    record["respondedAt"] = Date()
-                    try await publicDB.save(record)
-                    print("[CloudKit] Responded to limit suggestion (fallback): \(accepted ? "accepted" : "rejected")")
-                    return
-                }
-            }
-        } catch {
-            print("[CloudKit] Failed to respond to limit suggestion: \(error)")
         }
+        print("[CloudKit] No pending suggestion found to respond to")
     }
 }

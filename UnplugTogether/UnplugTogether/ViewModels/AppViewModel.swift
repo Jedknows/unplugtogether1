@@ -46,6 +46,7 @@ class AppViewModel: ObservableObject {
     @Published var deepLinkCode: String?  // Auto-filled from URL scheme
     @Published var extensionUsedToday = false  // True if extra time was approved today — breaks streak
     @Published var errorMessage: String?  // User-facing error (shown as alert)
+    @Published var confirmationMessage: String?  // User-facing success message
     var suppressErrors = false             // Suppress error alerts during retries
     @Published var myAvatarId: String = "avatar_01"      // My selected avatar
     @Published var partnerAvatarId: String = "avatar_02"  // Partner's avatar (from CloudKit)
@@ -714,6 +715,21 @@ class AppViewModel: ObservableObject {
     private func syncData() async {
         var hadErrors = false
 
+        // Read usage from the DeviceActivityMonitor extension (via shared UserDefaults)
+        let totalUsageMinutes = screenTime.readCurrentUsageMinutes()
+        if totalUsageMinutes > 0 {
+            // Distribute total usage across monitored apps proportionally
+            // (Screen Time API tracks all selected apps together)
+            let appCount = max(appLimits.count, 1)
+            let perAppMinutes = totalUsageMinutes / appCount
+            for limit in appLimits {
+                let currentTracked = myUsage[limit.bundleIdentifier] ?? 0
+                if perAppMinutes > currentTracked {
+                    myUsage[limit.bundleIdentifier] = perAppMinutes
+                }
+            }
+        }
+
         for (bundleId, minutes) in myUsage {
             await cloudKit.syncUsage(appBundleId: bundleId, minutesUsed: minutes)
         }
@@ -748,6 +764,15 @@ class AppViewModel: ObservableObject {
 
         // Check if partner approved our new-app add proposals
         await checkAcceptedAddProposals()
+
+        // Sync garden state with partner
+        if let garden = await cloudKit.fetchGarden() {
+            gardenPlants = garden.plants.filter { $0.isComplete }
+            activePlant = garden.plants.first { !$0.isComplete }
+            streak = garden.streak
+            unlockedPlantTypes = garden.unlockedPlantTypes
+            saveGardenLocally()
+        }
 
         // Track consecutive failures and surface to UI if persistent
         if hadErrors {
@@ -911,6 +936,9 @@ class AppViewModel: ObservableObject {
     func proposeLimitChange(appId: String, newLimit: Int) {
         guard let app = appLimits.first(where: { $0.bundleIdentifier == appId }) else { return }
 
+        // Don't send if same as current limit
+        guard newLimit != app.dailyLimitMinutes else { return }
+
         pendingLimitChangeProposals.insert(appId)
 
         let proposal = LimitProposal(
@@ -925,11 +953,8 @@ class AppViewModel: ObservableObject {
             await cloudKit.sendLimitProposal(proposal)
         }
 
-        // Show a confirmation that the proposal was sent
-        notifications.scheduleWarning(
-            appName: app.appName,
-            minutesRemaining: newLimit
-        )
+        // Show a brief confirmation that the proposal was sent
+        confirmationMessage = "Proposed \(app.appName) limit change to \(newLimit) min — waiting for \(partnerName) to approve"
     }
 
     /// Accept a limit change proposal from partner

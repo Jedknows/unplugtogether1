@@ -160,6 +160,14 @@ struct ContentView: View {
         } message: {
             Text(vm.errorMessage ?? "")
         }
+        .alert("Sent!", isPresented: Binding(
+            get: { vm.confirmationMessage != nil },
+            set: { if !$0 { vm.confirmationMessage = nil } }
+        )) {
+            Button("OK") { vm.confirmationMessage = nil }
+        } message: {
+            Text(vm.confirmationMessage ?? "")
+        }
     }
 }
 
