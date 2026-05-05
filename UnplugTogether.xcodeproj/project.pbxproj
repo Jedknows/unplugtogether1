@@ -6,20 +6,172 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AECA3C312F668862009436CE /* Device Activity Monitor Extension.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = AECA3C252F668862009436CE /* Device Activity Monitor Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AECA3C562F668A44009436CE /* Shield Action Extension.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = AECA3C4A2F668A44009436CE /* Shield Action Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AECA3C6B2F668A5B009436CE /* Shield Configuration Extension.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = AECA3C5F2F668A5B009436CE /* Shield Configuration Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AECA3C2F2F668862009436CE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AECA3C0B2F66882C009436CE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AECA3C242F668862009436CE;
+			remoteInfo = "Device Activity Monitor Extension";
+		};
+		AECA3C542F668A44009436CE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AECA3C0B2F66882C009436CE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AECA3C492F668A44009436CE;
+			remoteInfo = "Shield Action Extension";
+		};
+		AECA3C692F668A5B009436CE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AECA3C0B2F66882C009436CE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AECA3C5E2F668A5B009436CE;
+			remoteInfo = "Shield Configuration Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AECA3C362F668862009436CE /* Embed ExtensionKit Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstSubfolderSpec = 16;
+			files = (
+				AECA3C6B2F668A5B009436CE /* Shield Configuration Extension.appex in Embed ExtensionKit Extensions */,
+				AECA3C312F668862009436CE /* Device Activity Monitor Extension.appex in Embed ExtensionKit Extensions */,
+				AECA3C562F668A44009436CE /* Shield Action Extension.appex in Embed ExtensionKit Extensions */,
+			);
+			name = "Embed ExtensionKit Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		AECA3C132F66882C009436CE /* UnplugTogether.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UnplugTogether.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AECA3C252F668862009436CE /* Device Activity Monitor Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = "Device Activity Monitor Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AECA3C4A2F668A44009436CE /* Shield Action Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = "Shield Action Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AECA3C5F2F668A5B009436CE /* Shield Configuration Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = "Shield Configuration Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AECA3C9E2F668F6E009436CE /* Exceptions for "UnplugTogether" folder in "UnplugTogether" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				UnplugTogether/Info.plist,
+			);
+			target = AECA3C122F66882C009436CE /* UnplugTogether */;
+		};
+		AECA3CA02F6690D3009436CE /* Exceptions for "UnplugTogether" folder in "Device Activity Monitor Extension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				UnplugTogether/Models/Models.swift,
+			);
+			target = AECA3C242F668862009436CE /* Device Activity Monitor Extension */;
+		};
+		AECA3CA92F671D4F009436CE /* Exceptions for "UnplugTogether" folder in "Shield Action Extension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				UnplugTogether/Models/Models.swift,
+			);
+			target = AECA3C492F668A44009436CE /* Shield Action Extension */;
+		};
+		AECA3CAA2F671D4F009436CE /* Exceptions for "UnplugTogether" folder in "Shield Configuration Extension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				UnplugTogether/Models/Models.swift,
+			);
+			target = AECA3C5E2F668A5B009436CE /* Shield Configuration Extension */;
+		};
+		AECA3CAB2F671EB2009436CE /* Exceptions for "Device Activity Monitor Extension" folder in "Device Activity Monitor Extension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = AECA3C242F668862009436CE /* Device Activity Monitor Extension */;
+		};
+		AECA3CAC2F671EB6009436CE /* Exceptions for "Shield Action Extension" folder in "Shield Action Extension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ShieldActionExtension/Info.plist,
+			);
+			target = AECA3C492F668A44009436CE /* Shield Action Extension */;
+		};
+		AECA3CAD2F671EB8009436CE /* Exceptions for "Shield Configuration Extension" folder in "Shield Configuration Extension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = AECA3C5E2F668A5B009436CE /* Shield Configuration Extension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AECA3C152F66882C009436CE /* UnplugTogether */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AECA3C9E2F668F6E009436CE /* Exceptions for "UnplugTogether" folder in "UnplugTogether" target */,
+				AECA3CA02F6690D3009436CE /* Exceptions for "UnplugTogether" folder in "Device Activity Monitor Extension" target */,
+				AECA3CA92F671D4F009436CE /* Exceptions for "UnplugTogether" folder in "Shield Action Extension" target */,
+				AECA3CAA2F671D4F009436CE /* Exceptions for "UnplugTogether" folder in "Shield Configuration Extension" target */,
+			);
 			path = UnplugTogether;
+			sourceTree = "<group>";
+		};
+		AECA3C262F668862009436CE /* Device Activity Monitor Extension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AECA3CAB2F671EB2009436CE /* Exceptions for "Device Activity Monitor Extension" folder in "Device Activity Monitor Extension" target */,
+			);
+			path = "Device Activity Monitor Extension";
+			sourceTree = "<group>";
+		};
+		AECA3C4B2F668A44009436CE /* Shield Action Extension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AECA3CAC2F671EB6009436CE /* Exceptions for "Shield Action Extension" folder in "Shield Action Extension" target */,
+			);
+			path = "Shield Action Extension";
+			sourceTree = "<group>";
+		};
+		AECA3C602F668A5B009436CE /* Shield Configuration Extension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AECA3CAD2F671EB8009436CE /* Exceptions for "Shield Configuration Extension" folder in "Shield Configuration Extension" target */,
+			);
+			path = "Shield Configuration Extension";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		AECA3C102F66882C009436CE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AECA3C222F668862009436CE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AECA3C472F668A44009436CE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AECA3C5C2F668A5B009436CE /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +185,9 @@
 			isa = PBXGroup;
 			children = (
 				AECA3C152F66882C009436CE /* UnplugTogether */,
+				AECA3C262F668862009436CE /* Device Activity Monitor Extension */,
+				AECA3C4B2F668A44009436CE /* Shield Action Extension */,
+				AECA3C602F668A5B009436CE /* Shield Configuration Extension */,
 				AECA3C142F66882C009436CE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +196,9 @@
 			isa = PBXGroup;
 			children = (
 				AECA3C132F66882C009436CE /* UnplugTogether.app */,
+				AECA3C252F668862009436CE /* Device Activity Monitor Extension.appex */,
+				AECA3C4A2F668A44009436CE /* Shield Action Extension.appex */,
+				AECA3C5F2F668A5B009436CE /* Shield Configuration Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -55,10 +213,14 @@
 				AECA3C0F2F66882C009436CE /* Sources */,
 				AECA3C102F66882C009436CE /* Frameworks */,
 				AECA3C112F66882C009436CE /* Resources */,
+				AECA3C362F668862009436CE /* Embed ExtensionKit Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				AECA3C302F668862009436CE /* PBXTargetDependency */,
+				AECA3C552F668A44009436CE /* PBXTargetDependency */,
+				AECA3C6A2F668A5B009436CE /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				AECA3C152F66882C009436CE /* UnplugTogether */,
@@ -69,6 +231,72 @@
 			productName = UnplugTogether;
 			productReference = AECA3C132F66882C009436CE /* UnplugTogether.app */;
 			productType = "com.apple.product-type.application";
+		};
+		AECA3C242F668862009436CE /* Device Activity Monitor Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AECA3C332F668862009436CE /* Build configuration list for PBXNativeTarget "Device Activity Monitor Extension" */;
+			buildPhases = (
+				AECA3C212F668862009436CE /* Sources */,
+				AECA3C222F668862009436CE /* Frameworks */,
+				AECA3C232F668862009436CE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AECA3C262F668862009436CE /* Device Activity Monitor Extension */,
+			);
+			name = "Device Activity Monitor Extension";
+			packageProductDependencies = (
+			);
+			productName = "Device Activity Monitor Extension";
+			productReference = AECA3C252F668862009436CE /* Device Activity Monitor Extension.appex */;
+			productType = "com.apple.product-type.extensionkit-extension";
+		};
+		AECA3C492F668A44009436CE /* Shield Action Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AECA3C5A2F668A44009436CE /* Build configuration list for PBXNativeTarget "Shield Action Extension" */;
+			buildPhases = (
+				AECA3C462F668A44009436CE /* Sources */,
+				AECA3C472F668A44009436CE /* Frameworks */,
+				AECA3C482F668A44009436CE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AECA3C4B2F668A44009436CE /* Shield Action Extension */,
+			);
+			name = "Shield Action Extension";
+			packageProductDependencies = (
+			);
+			productName = "Shield Action Extension";
+			productReference = AECA3C4A2F668A44009436CE /* Shield Action Extension.appex */;
+			productType = "com.apple.product-type.extensionkit-extension";
+		};
+		AECA3C5E2F668A5B009436CE /* Shield Configuration Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AECA3C6D2F668A5B009436CE /* Build configuration list for PBXNativeTarget "Shield Configuration Extension" */;
+			buildPhases = (
+				AECA3C5B2F668A5B009436CE /* Sources */,
+				AECA3C5C2F668A5B009436CE /* Frameworks */,
+				AECA3C5D2F668A5B009436CE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AECA3C602F668A5B009436CE /* Shield Configuration Extension */,
+			);
+			name = "Shield Configuration Extension";
+			packageProductDependencies = (
+			);
+			productName = "Shield Configuration Extension";
+			productReference = AECA3C5F2F668A5B009436CE /* Shield Configuration Extension.appex */;
+			productType = "com.apple.product-type.extensionkit-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -81,6 +309,15 @@
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					AECA3C122F66882C009436CE = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					AECA3C242F668862009436CE = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					AECA3C492F668A44009436CE = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					AECA3C5E2F668A5B009436CE = {
 						CreatedOnToolsVersion = 26.3;
 					};
 				};
@@ -100,12 +337,36 @@
 			projectRoot = "";
 			targets = (
 				AECA3C122F66882C009436CE /* UnplugTogether */,
+				AECA3C242F668862009436CE /* Device Activity Monitor Extension */,
+				AECA3C492F668A44009436CE /* Shield Action Extension */,
+				AECA3C5E2F668A5B009436CE /* Shield Configuration Extension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		AECA3C112F66882C009436CE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AECA3C232F668862009436CE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AECA3C482F668A44009436CE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AECA3C5D2F668A5B009436CE /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +383,46 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AECA3C212F668862009436CE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AECA3C462F668A44009436CE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AECA3C5B2F668A5B009436CE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AECA3C302F668862009436CE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AECA3C242F668862009436CE /* Device Activity Monitor Extension */;
+			targetProxy = AECA3C2F2F668862009436CE /* PBXContainerItemProxy */;
+		};
+		AECA3C552F668A44009436CE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AECA3C492F668A44009436CE /* Shield Action Extension */;
+			targetProxy = AECA3C542F668A44009436CE /* PBXContainerItemProxy */;
+		};
+		AECA3C6A2F668A5B009436CE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AECA3C5E2F668A5B009436CE /* Shield Configuration Extension */;
+			targetProxy = AECA3C692F668A5B009436CE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		AECA3C1C2F66882D009436CE /* Debug */ = {
@@ -251,8 +551,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = UnplugTogether/UnplugTogether.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = Q4RA4WMD6K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -265,9 +567,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = V1.UnplugTogether;
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jedsiegel.unplugtogether;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -283,9 +586,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Q4RA4WMD6K;
+				CODE_SIGN_ENTITLEMENTS = UnplugTogether/UnplugTogether.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Q4RA4WMD6K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -297,12 +604,209 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = V1.UnplugTogether;
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jedsiegel.unplugtogether;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = UnplugTogether_AppStore;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AECA3C342F668862009436CE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Device Activity Monitor Extension/Device_Activity_Monitor_Extension.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q4RA4WMD6K;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Device Activity Monitor Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Device Activity Monitor Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jedsiegel.unplugtogether.device-activity-monitor";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AECA3C352F668862009436CE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Device Activity Monitor Extension/Device_Activity_Monitor_Extension.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Q4RA4WMD6K;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Device Activity Monitor Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Device Activity Monitor Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jedsiegel.unplugtogether.device-activity-monitor";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = UnplugTogether_DAM_AppStore;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AECA3C572F668A44009436CE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Shield Action Extension/Shield_Action_Extension.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q4RA4WMD6K;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Shield Action Extension/ShieldActionExtension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Shield Action Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jedsiegel.unplugtogether.shield-action";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AECA3C582F668A44009436CE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Shield Action Extension/Shield_Action_Extension.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Q4RA4WMD6K;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Shield Action Extension/ShieldActionExtension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Shield Action Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jedsiegel.unplugtogether.shield-action";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = UnplugTogether_ShieldAction_AppStore;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AECA3C6E2F668A5B009436CE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Shield Configuration Extension/Shield_Configuration_Extension.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q4RA4WMD6K;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Shield Configuration Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Shield Configuration Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jedsiegel.unplugtogether.shield-configuration";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AECA3C6F2F668A5B009436CE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Shield Configuration Extension/Shield_Configuration_Extension.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Q4RA4WMD6K;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Shield Configuration Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Shield Configuration Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jedsiegel.unplugtogether.shield-configuration";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = UnplugTogether_ShieldConfig_AppStore;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
@@ -327,6 +831,33 @@
 			buildConfigurations = (
 				AECA3C1F2F66882D009436CE /* Debug */,
 				AECA3C202F66882D009436CE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AECA3C332F668862009436CE /* Build configuration list for PBXNativeTarget "Device Activity Monitor Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AECA3C342F668862009436CE /* Debug */,
+				AECA3C352F668862009436CE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AECA3C5A2F668A44009436CE /* Build configuration list for PBXNativeTarget "Shield Action Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AECA3C572F668A44009436CE /* Debug */,
+				AECA3C582F668A44009436CE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AECA3C6D2F668A5B009436CE /* Build configuration list for PBXNativeTarget "Shield Configuration Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AECA3C6E2F668A5B009436CE /* Debug */,
+				AECA3C6F2F668A5B009436CE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

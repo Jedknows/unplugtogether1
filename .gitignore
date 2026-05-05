@@ -1,0 +1,50 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.pbxuser
+*.perspective
+*.perspectivev3
+xcuserdata/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+*.resolved
+
+# Xcode generated files
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Cocoapods
+Pods/
+Podfile.lock
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+
+# OS
+*.swp
+*~
+.project
+.classpath
+.c9/
+
+# Archives
+*.zip
+*.rar
+
+# Temporary files
+*.tmp
+*.temp

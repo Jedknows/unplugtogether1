@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Family Controls entitlement — required for Screen Time API -->
+    <key>com.apple.developer.family-controls</key>
+    <array>
+        <string>individual</string>
+    </array>
+
+    <!-- App Group for sharing data between main app and extensions -->
+    <key>com.apple.security.application-groups</key>
+    <array>
+        <string>group.com.unplugtogether.shared</string>
+    </array>
+
+    <!-- CloudKit for partner syncing -->
+    <key>com.apple.developer.icloud-container-identifiers</key>
+    <array>
+        <string>iCloud.com.unplugtogether.shared</string>
+    </array>
+    <key>com.apple.developer.icloud-services</key>
+    <array>
+        <string>CloudKit</string>
+    </array>
+
+    <!-- Push notifications for approval requests -->
+    <key>aps-environment</key>
+    <string>development</string>
+
+    <!-- Associated Domains for Universal Links -->
+    <key>com.apple.developer.associated-domains</key>
+    <array>
+        <string>applinks:unplugtogether.app</string>
+    </array>
+</dict>
+</plist>
