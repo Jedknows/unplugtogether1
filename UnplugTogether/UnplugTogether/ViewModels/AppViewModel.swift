@@ -353,35 +353,34 @@ class AppViewModel: ObservableObject {
               let code = cloudKit.pairingCode else { return }
 
         let publicDB = CKContainer(identifier: "iCloud.com.unplugtogether.shared").publicCloudDatabase
-        let predicate = NSPredicate(
-            format: "pairingCode == %@ AND requesterId == %@ AND status == %@",
-            code, partner.id, ApprovalStatus.approved.rawValue
-        )
-        let query = CKQuery(recordType: "ApprovalRequest", predicate: predicate)
+
+        // Use deterministic record ID — no query/index needed
+        let recordID = CKRecord.ID(recordName: "approval_\(code)_pending")
 
         do {
-            let (results, _) = try await publicDB.records(matching: query)
+            let record = try await publicDB.record(for: recordID)
 
-            for (_, result) in results {
-                guard let record = try? result.get() else { continue }
-                let bundleId = record["appBundleId"] as? String ?? ""
-                let extraMinutes = record["extraMinutesGranted"] as? Int ?? 15
+            // Only process if this user is the requester and it's been approved
+            let requesterId = record["requesterId"] as? String ?? ""
+            let status = record["status"] as? String ?? ""
+            guard requesterId == partner.id && status == ApprovalStatus.approved.rawValue else { return }
 
-                // Unblock and grant extension
-                screenTime.grantExtension(minutes: extraMinutes, forApp: bundleId)
+            let bundleId = record["appBundleId"] as? String ?? ""
+            let extraMinutes = record["extraMinutesGranted"] as? Int ?? 15
 
-                // Extension was used — streak will be broken at day end
-                extensionUsedToday = true
-                sharedDefaults?.set(true, forKey: "extensionUsedToday")
+            // Unblock and grant extension
+            screenTime.grantExtension(minutes: extraMinutes, forApp: bundleId)
 
-                // Mark as processed by deleting from pending
-                let recordID = record.recordID
-                try? await publicDB.deleteRecord(withID: recordID)
+            // Extension was used — streak will be broken at day end
+            extensionUsedToday = true
+            sharedDefaults?.set(true, forKey: "extensionUsedToday")
 
-                print("[AppVM] Auto-unblocked \(bundleId) — partner approved \(extraMinutes) min")
-            }
+            // Mark as processed by deleting
+            try? await publicDB.deleteRecord(withID: recordID)
+
+            print("[AppVM] Auto-unblocked \(bundleId) — partner approved \(extraMinutes) min")
         } catch {
-            print("[AppVM] Failed to check approval responses: \(error)")
+            // No pending approval or not yet approved — expected
         }
     }
 
@@ -933,11 +932,18 @@ class AppViewModel: ObservableObject {
     // MARK: - Propose Limit Change
 
     /// Send a limit change proposal to partner for approval
+    private var isSendingProposal = false
+
     func proposeLimitChange(appId: String, newLimit: Int) {
         guard let app = appLimits.first(where: { $0.bundleIdentifier == appId }) else { return }
 
         // Don't send if same as current limit
         guard newLimit != app.dailyLimitMinutes else { return }
+
+        // Prevent duplicate/spam sends
+        guard !pendingLimitChangeProposals.contains(appId) else { return }
+        guard !isSendingProposal else { return }
+        isSendingProposal = true
 
         pendingLimitChangeProposals.insert(appId)
 
@@ -951,6 +957,7 @@ class AppViewModel: ObservableObject {
 
         Task {
             await cloudKit.sendLimitProposal(proposal)
+            isSendingProposal = false
         }
 
         // Show a brief confirmation that the proposal was sent
